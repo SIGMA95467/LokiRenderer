@@ -21,6 +21,7 @@ public:
     Texture* AmbientTex;
     Texture* RoughnessTex;
     Texture* MetalnessTex;
+    Texture* specularTex;
 };
 
 

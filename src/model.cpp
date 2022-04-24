@@ -76,7 +76,8 @@ void Model::LoadModel(std::string path)
 				for (auto material : materials) {
 								//printf("material[%d].diffuse_texname = %s\n", int(i),
 								//				materials[i].diffuse_texname.c_str());
-								std::cout << material.diffuse_texname << material.normal_texname << material.ambient_texname << material.emissive_texname << std::endl;
+								std::cout << material.diffuse_texname << material.normal_texname << material.ambient_texname << material.emissive_texname 
+												<< material.specular_texname << std::endl;
 				}
 
 
@@ -100,9 +101,13 @@ void Model::LoadModel(std::string path)
 												}
 												if (material->emissive_texname.length() > 0)
 												{
-																pMat->AmbientTex = new Texture(directory + material->emissive_texname);
+																pMat->EmissionTex = new Texture(directory + material->emissive_texname);
 												}
-												
+												if (material->specular_texname.length() > 0)
+												{
+																pMat->specularTex = new Texture(directory + material->specular_texname);
+												}
+																
 												//TODO: read mtl
 												//std::string OcclusionTex_texname = "helmet_emission.tga";
 												//pMat->OcclusionTex = new Texture(directory + OcclusionTex_texname);

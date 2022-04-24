@@ -2,19 +2,29 @@
 
 C++ software renderer
 
+<img src="screenshots/diablo3_pose.png" >
 
 
-<img src="screenshots/miku.png" width="410">
 
-<img src="screenshots/helmet1.png" width="410">
+<img src="screenshots/floor.png" width="400"><img src="screenshots/helmet.png" width="400">
+
+
+
+
+
+
+
+
+
 
 ## Main Features
 
-* Blinn-Phong shading
-* Perspective correct interpolation
-* Back-face culling
+* phong shading
+* perspective correct interpolation
+* back-face culling
 * Homogeneous clipping
-* FPS camera
+* Moveable camera
+* zbuffer test
 
 
 

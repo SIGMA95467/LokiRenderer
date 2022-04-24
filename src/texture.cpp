@@ -16,8 +16,8 @@ std::string& replace_all_distinct(std::string& str, const std::string& old_value
 Texture::Texture(std::string path)
 {
     mPath = replace_all_distinct(path, "\\", "/");
-    //helmetŒ∆¿Ì
-    stbi_set_flip_vertically_on_load(true);
+    
+    //stbi_set_flip_vertically_on_load(true);
 
     unsigned char* data = stbi_load(path.c_str(), &mWidth, &mHeight, &mChannels, 0);
     

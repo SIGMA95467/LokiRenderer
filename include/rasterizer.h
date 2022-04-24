@@ -19,7 +19,6 @@ public:
 
 
 				void DrawPixel(int x, int y, Color& c);
-				void DrawPixelInvY(int x, int y, Color& c);
 				//void DrawPixel(int x, int y, unsigned int& c);
 				void viewportTransform(Vertex* vertexs);
 				void BoundBox(Vertex* vertexs, glm::vec2& bboxmin, glm::vec2& bboxmax);
@@ -29,7 +28,6 @@ public:
 				void DrawWireFrame(glm::vec4* vertexs, Color& color);
 				//void DrawWireFrame(const std::vector<glm::vec3>& vertexs, Color& color);
 
-				void DrawTriangle(Vertex* vertexs, IShader* shader);
 				void DrawTriangle(VSOutput* vert0, VSOutput* vert1, VSOutput* vert2, IShader* shader);
 				void DrawLine(int x1, int y1, int x2, int y2, Color &color);
 
@@ -40,6 +38,5 @@ public:
 
 private:
 				RenderContext* mRenderContext;
-				__m128 mBarycentricCoord;
 };
 

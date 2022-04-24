@@ -35,37 +35,51 @@ void Renderer::SetCurCamera(Camera* cam)
 }
 
 
-
-
-void Renderer::RenderMesh(Mesh* mesh, glm::mat4* modelMatrix, IShader* shader, Material* material)
+float* Renderer::GetDepthBuffer()
 {
-				//set shader matrix
-				glm::mat4 MVP = mCamera->projectionMaxtrix * mCamera->viewMatrix * (*modelMatrix);
-				shader->PVMMatrix = &MVP;
+				return mRenderContext->depthBuffer;
+}
 
-				shader->ViewMatrix = &(mCamera->viewMatrix);
-				shader->ProjectionMatrix = &(mCamera->projectionMaxtrix);
-				shader->ViewportMatrix = &(mCamera->viewportMaxtrix);
 
-				shader->ModelMatrix = modelMatrix;
-				//glm::mat4 World2Object = glm::inverse(*modelMatrix);
-				glm::mat4 normal_matrix = glm::transpose(glm::inverse(*modelMatrix));
-				shader->NormalMatrix = &normal_matrix;
+void Renderer::RenderMesh(Mesh* mesh, glm::mat4* modelMatrix, IShader* shader, Material* material, Light* light)
+{
+				if (light) {
+								shader->light = light;
+				}
+				else {
+								//set shader matrix
+								glm::mat4 MVP = mCamera->projectionMaxtrix * mCamera->viewMatrix * (*modelMatrix);
+								shader->PVMMatrix = &MVP;
 
-				glm::mat4 MV = mCamera->viewMatrix * (*modelMatrix);
-				shader->ModelViewMatrix = &MV;
+								shader->ViewMatrix = &(mCamera->viewMatrix);
+								shader->ProjectionMatrix = &(mCamera->projectionMaxtrix);
+								shader->ViewportMatrix = &(mCamera->viewportMaxtrix);
 
-				shader->WorldSpaceViewPos = &(mCamera->position);
+								shader->ModelMatrix = modelMatrix;
+								//glm::mat4 World2Object = glm::inverse(*modelMatrix);
+								glm::mat4 normal_matrix = glm::transpose(glm::inverse(*modelMatrix));
+								shader->NormalMatrix = &normal_matrix;
 
-				//set shader material
-				shader->ambientT = material->AmbientTex;
-				shader->diffuseT = material->DiffuseTex;
-				shader->emissionT = material->EmissionTex;
-				shader->normalT = material->NormalTex;
-				shader->occlusionT = material->OcclusionTex;
-				shader->RenderMesh = mesh;
+								glm::mat4 MV = mCamera->viewMatrix * (*modelMatrix);
+								shader->ModelViewMatrix = &MV;
 
-				mShader = shader;
+								shader->WorldSpaceViewPos = &(mCamera->position);
+
+								//set shader material
+								if (material) {
+												shader->specularT = material->specularTex;
+												shader->ambientT = material->AmbientTex;
+												shader->diffuseT = material->DiffuseTex;
+												shader->emissionT = material->EmissionTex;
+												shader->normalT = material->NormalTex;
+												shader->occlusionT = material->OcclusionTex;
+								}
+
+								shader->RenderMesh = mesh;
+
+								mShader = shader;
+				}
+	
 
 
 				
@@ -124,14 +138,14 @@ void Renderer::RenderMesh(Mesh* mesh, glm::mat4* modelMatrix, IShader* shader, M
 
 
 								//±³ÃæÌÞ³ý
-								glm::vec4 u = ndcCoord[1] - ndcCoord[0];
-								glm::vec4 v = ndcCoord[2] - ndcCoord[0];
-								//float z = (u.x * v.y) - (u.y * v.x);
-								float z = (v.x * u.y) - (v.y * u.x);
-								if (z > 0) {
-												numBackfaceCull++;
-												continue;
-								}
+								//glm::vec4 u = ndcCoord[1] - ndcCoord[0];
+								//glm::vec4 v = ndcCoord[2] - ndcCoord[0];
+								////float z = (u.x * v.y) - (u.y * v.x);
+								//float z = (v.x * u.y) - (v.y * u.x);
+								//if (z > 0) {
+								//				numBackfaceCull++;
+								//				continue;
+								//}
 								for(int k = 0; k < 3; ++k) 
 												vsOutputs[k].position = screenCoord[k];
 

@@ -12,7 +12,8 @@ struct VSOutput
 
 				glm::vec3 worldView;
 				glm::vec3 worldNormal;
-				//glm::vec2 varying[4];
+				//glm::vec3 LightSpacePos;
+
 
 };
 

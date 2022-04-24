@@ -1,9 +1,9 @@
-#include "MatrixUtils.h"
+#include "matrixUtils.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 
-glm::mat4 MatrixUtils::calcViewPortMatrix(int width, int height)
+glm::mat4 matrixUtils::calcViewPortMatrix(int width, int height)
 {
 				//Setup viewport matrix (ndc space -> screen space)
 				glm::mat4 vpMat;
@@ -16,7 +16,7 @@ glm::mat4 MatrixUtils::calcViewPortMatrix(int width, int height)
 				return vpMat;
 }
 
-glm::mat4 MatrixUtils::calcViewMatrix(glm::vec3 camera, glm::vec3 target, glm::vec3 worldUp)
+glm::mat4 matrixUtils::calcViewMatrix(glm::vec3 camera, glm::vec3 target, glm::vec3 worldUp)
 {
 				//Setup view matrix (world space -> camera space)
 				glm::mat4 vMat;
@@ -35,7 +35,7 @@ glm::mat4 MatrixUtils::calcViewMatrix(glm::vec3 camera, glm::vec3 target, glm::v
 				return vMat;
 }
 
-glm::mat4 MatrixUtils::calcPerspProjectMatrix(float fovy, float aspect, float near, float far)
+glm::mat4 matrixUtils::calcPerspProjectMatrix(float fovy, float aspect, float near, float far)
 {
 				//Setup perspective matrix (camera space -> homogeneous space)
 				glm::mat4 pMat = glm::mat4(1.0f);
@@ -55,7 +55,7 @@ glm::mat4 MatrixUtils::calcPerspProjectMatrix(float fovy, float aspect, float ne
 
 
 
-glm::mat4 MatrixUtils::calcOrthoProjectMatrix(float left, float right, float bottom, float top, float near, float far)
+glm::mat4 matrixUtils::calcOrthoProjectMatrix(float left, float right, float bottom, float top, float near, float far)
 {
 				//Setup orthogonal matrix (camera space -> homogeneous space)
 				glm::mat4 pMat;

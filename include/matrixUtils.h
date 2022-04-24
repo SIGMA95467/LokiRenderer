@@ -4,7 +4,7 @@
 
 
 
-class MatrixUtils final
+class matrixUtils final
 {
 public:
 

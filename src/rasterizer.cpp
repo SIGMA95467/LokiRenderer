@@ -1,7 +1,7 @@
 #include "rasterizer.h"
 
-//#define WIRE_FRAME
-#define SHADE
+#define WIRE_FRAME
+//#define SHADE
 
 Rasterizer::Rasterizer(RenderContext* pcontext)
 {
@@ -13,61 +13,7 @@ Rasterizer::~Rasterizer()
 
 }
 
-//void Rasterizer::DrawTriangle(Vertex* vertexs, IShader* shader)
-//{
-//				glm::vec2 bboxmin(mathUtils::Infinity, mathUtils::Infinity);
-//				glm::vec2 bboxmax(mathUtils::NegativeInfinity, mathUtils::NegativeInfinity);
-//				
-//
-//				//viewportTransform(vertexs);
-//				BoundBox(vertexs, bboxmin, bboxmax);
-//
-//
-//				glm::ivec2 P;
-//				Color color;
-//				for (P.x = bboxmin.x; P.x <= bboxmax.x; P.x++) {
-//								for (P.y = bboxmin.y; P.y <= bboxmax.y; P.y++)
-//								{					
-//
-//
-//												glm::vec3 p(P.x, P.y, 0);
-//												glm::vec3 barycentricCoord = CalcBarycentric(vertexs[0].position, vertexs[1].position, vertexs[2].position, p);
-//												float fInvW = 1.0f / (barycentricCoord.x * vertexs[0].w + barycentricCoord.y * vertexs[1].w + barycentricCoord.z * vertexs[2].w);
-//												float depth = barycentricCoord.x * vertexs[0].w + barycentricCoord.y * vertexs[0].w + barycentricCoord.z * vertexs[0].w;
-//												//depth *= fInvW;
-//
-//												if (is_inside_triangle(barycentricCoord)) {
-//																//深度测试
-//																if (mRenderContext->depthBuffer[(P.x + P.y * mRenderContext->width)] < depth) continue;
-//																//if (depth <= mRenderContext->depthBuffer[P.x + P.y * mRenderContext->width]) {
-//																				//顶点属性插值
-//																				glm::vec2 interpUV(0, 0);
-//																				interpUV.x = barycentricCoord.x * vertexs[0].u + barycentricCoord.y * vertexs[1].u + barycentricCoord.z * vertexs[2].u;
-//																				interpUV.y = barycentricCoord.x * vertexs[0].v + barycentricCoord.y * vertexs[1].v + barycentricCoord.z * vertexs[2].v;
-//																				Color interpCol = fInvW * (barycentricCoord.x * vertexs[0].color + barycentricCoord.y * vertexs[0].color + barycentricCoord.z * vertexs[0].color);
-//																				shader->FragmentInColor = &interpCol;
-//																				shader->FragmentInUV = &interpUV;
-//																				
-//
-//
-//
-//#ifdef WIRE_FRAME
-//																				glm::vec3 verts[]{ vertexs[0].position, vertexs[1].position, vertexs[2].position };
-//																				DrawWireFrame(verts, Color::white);
-//#endif // WIRE_FRAME
-//
-//#ifdef SHADE
-//																				shader->fragment(barycentricCoord, color);
-//																				DrawPixel(P.x, P.y, color);
-//#endif // SHADE
-//																				mRenderContext->depthBuffer[P.x + P.y * mRenderContext->width] = depth;
-//
-//												}
-//
-//
-//								}
-//				}
-//}
+
 
 
 void Rasterizer::DrawTriangle(VSOutput *vert0, VSOutput *vert1, VSOutput *vert2, IShader* shader)
@@ -148,8 +94,8 @@ void Rasterizer::DrawTriangle(VSOutput *vert0, VSOutput *vert1, VSOutput *vert2,
 
 
 #ifdef SHADE
-												shader->fragment(barycentricCoord, color);
-												DrawPixel(P.x, P.y, color);
+												if(shader->fragment(barycentricCoord, color))
+																DrawPixel(P.x, P.y, color);
 #endif // SHADE
 #ifdef WIRE_FRAME
 												glm::vec4 verts[]{ vert0->position, vert1->position, vert2->position };
@@ -259,14 +205,7 @@ bool Rasterizer::is_inside_triangle(glm::vec3 barycentricCoord)
 				return flag;
 }
 
-void Rasterizer::viewportTransform(Vertex* vertexs) {
-				for (int i = 0; i < 3; i++) {
-								//Adding half a pixel to avoid gaps on small vertex values
-								//NDC -> screen space
-								(vertexs + i)->position.x = (((vertexs + i)->position.x + 1) * mRenderContext->width * 0.5) + 0.5;
-								(vertexs + i)->position.y = (((vertexs + i)->position.y + 1) * mRenderContext->height * 0.5) + 0.5;
-				}
-}
+
 
 void Rasterizer::BoundBox(Vertex* vertexs, glm::vec2& bboxmin, glm::vec2& bboxmax) {
 				glm::vec2 clamp(mRenderContext->width - 1, mRenderContext->height - 1);

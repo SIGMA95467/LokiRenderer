@@ -6,7 +6,7 @@ Camera::Camera(const glm::vec3& _pos, const glm::vec3& _target, const glm::vec3&
 				position = _pos;
 				target = _target;
 				up = _up;
-				viewMatrix = MatrixUtils::calcViewMatrix(_pos, _target, _up);
+				viewMatrix = matrixUtils::calcViewMatrix(_pos, _target, _up);
 				viewportMaxtrix = glm::mat4(0);
 }
 
@@ -17,7 +17,7 @@ Camera::~Camera()
 
 void Camera::UpdateViewMatrix()
 {
-				viewMatrix = MatrixUtils::calcViewMatrix(position, target, up);
+				viewMatrix = matrixUtils::calcViewMatrix(position, target, up);
 }
 
 
@@ -29,7 +29,7 @@ void Camera::SetPespective(float fovy, float aspect, float _zNear, float _zFar)
 				zNear = _zNear;
 				Fov = fovy;
 				Aspect = aspect;
-				projectionMaxtrix = MatrixUtils::calcPerspProjectMatrix(fovy, aspect, zNear, zFar);
+				projectionMaxtrix = matrixUtils::calcPerspProjectMatrix(fovy, aspect, zNear, zFar);
 }
 void updata_camera_pos(Camera* camera)
 {

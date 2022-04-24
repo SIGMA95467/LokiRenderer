@@ -13,6 +13,7 @@ Material::Material(std::string name)
     RoughnessTex = nullptr;
     MetalnessTex = nullptr;
     OcclusionTex = nullptr;
+    specularTex = nullptr;
 };
 
 //TODO: samart pointer?
@@ -44,6 +45,10 @@ Material:: ~Material() {
     if (MetalnessTex)
     {
         delete MetalnessTex;
+    }
+    if (specularTex)
+    {
+        delete specularTex;
     }
     //if (Shader)
     //{

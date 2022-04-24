@@ -9,6 +9,11 @@
 #include "vertex.h"
 #include "light.h"
 
+//void calcDirectionLight() {
+//    
+//
+//}
+
 class IShader
 {
 public:
@@ -21,7 +26,7 @@ public:
     //glm::vec3* DirectionLightDir;
     //float* DirectionLightIntensity;
 
-    //Light* light;
+    Light* light;
     
 
     glm::vec3* WorldSpaceViewPos;
@@ -37,7 +42,8 @@ public:
     
 
     Mesh* RenderMesh;
-    Texture* diffuseT, * ambientT, * normalT, *emissionT, *occlusionT;
+    Texture* diffuseT, * ambientT, * normalT, *emissionT, *occlusionT,
+        * specularT;
 
     Color* FragmentInColor;
     glm::vec2* FragmentInUV;
@@ -48,6 +54,7 @@ public:
     //glm::vec3* lightDirVal, * lightCol, * lightPos;
 
     glm::vec3 WorldPos;
+    glm::vec3 LightSpacePos;
     glm::vec3 WorldNorlmal;
     glm::vec3 WorldTexcoord;
     glm::vec3 WorldTangent;
@@ -79,7 +86,7 @@ public:
     //    delete[] Fragment_payload;
     //};
     virtual glm::vec4 vertex(int bufferIndex, int triangleIndex, VSOutput* vsOutput) = 0;
-    virtual void fragment(const glm::vec3& barycentric, Color& color) = 0;
+    virtual bool fragment(const glm::vec3& barycentric, Color& color) = 0;
 };
 
 class FlatShader : public IShader
@@ -105,9 +112,10 @@ class FlatShader : public IShader
         return *PVMMatrix * tmp; // transform it to screen coordinates
     }
 
-    virtual void fragment(const glm::vec3& barycentric, Color& color)
+    virtual bool fragment(const glm::vec3& barycentric, Color& color)
     {
         color = Color::white * varIntensity;
+        return true;
     }
 };
 
@@ -137,7 +145,7 @@ class PhongShader : public IShader
         return *PVMMatrix * tmp; // MVP
     }
 
-    virtual void fragment(const glm::vec3& barycentric, Color& color)
+    virtual bool fragment(const glm::vec3& barycentric, Color& color)
     {
         LightDir = interpViewDir;
         ka = glm::vec3(0.01f, 0.01f, 0.01f);
@@ -172,25 +180,30 @@ class PhongShader : public IShader
         color.g = col.y;
         color.b = col.z;
         color.a = 1;
+
+        return true;
     }
 };
 
 
 class TextureMapShader : public IShader {
+
     virtual glm::vec4 vertex(int bufferIndex, int triangleIndex, VSOutput* vsOutput) {
         glm::vec3 meshVertex = RenderMesh->Vertices[bufferIndex];
 
-
+       
         //法线变换
         glm::vec3 meshNormal = glm::normalize(RenderMesh->Normals[bufferIndex]);
         glm::vec4 worldNormal = *NormalMatrix * glm::vec4(meshNormal, 0.0f);
         //顶点坐标*VP矩阵 局部空间 -> 观察空间
-        glm::vec4 worldPos = *ModelViewMatrix * glm::vec4(meshVertex, 0.0f);
-        glm::vec3 worldView = *WorldSpaceViewPos - glm::vec3(worldPos.x, worldPos.y, worldPos.z);
+        glm::vec4 WorldPos = *ModelMatrix * glm::vec4(meshVertex, 0.0f);
+        glm::vec3 worldView = *WorldSpaceViewPos - glm::vec3(WorldPos.x, WorldPos.y, WorldPos.z);
+        //glm::vec4 LightSpacePos = light->projectionMaxtrix * light->viewMatrix * WorldPos;
+        
 
         vsOutput->worldView = worldView;
         vsOutput->worldNormal = glm::vec3(worldNormal.x, worldNormal.y, worldNormal.z);
-
+        //vsOutput->LightSpacePos = glm::vec3(LightSpacePos.x, LightSpacePos.y, LightSpacePos.z);
         //LightDir = glm::normalize(glm::vec3(0, 1, -1));
 
 
@@ -199,24 +212,29 @@ class TextureMapShader : public IShader {
         return *PVMMatrix * tmp; // MVP
     }
 
-    virtual void fragment(const glm::vec3& barycentric, Color& color)
+    virtual bool fragment(const glm::vec3& barycentric, Color& color)
     {
-        
-        LightDir = interpViewDir;
+        //calcDirectionLight();
+        //LightDir = interpViewDir;
+        LightDir = glm::vec3(1);
+        //法线在世界空间坐标的值为[-1, 1]
+        if (normalT) {
+            interpNormal = glm::normalize(2.0f * normalT->SampleColor(interpUV.x, interpUV.y) - 1.0f);
+        }
 
-        interpNormal = normalT ? normalT->SampleColor(interpUV.x, interpUV.y) : interpNormal;
         interpAO = occlusionT ? occlusionT->SampleIntensity(interpUV.x, interpUV.y) : 1.0f;
-        //ka = ambientT ? ambientT->SampleColor(interpUV.x, interpUV.y) : glm::vec3(0.01f);
+        ka = ambientT ? ambientT->SampleColor(interpUV.x, interpUV.y) : glm::vec3(0.01f);
         kd = diffuseT ? diffuseT->SampleColor(interpUV.x, interpUV.y) : glm::vec3(0.8f);
-        ka = glm::vec3(0.8f);
-        ks = glm::vec3(0.5f, 0.5f, 0.5f);
+        //ka = glm::vec3(0.8f);
+        ks = specularT ? specularT->SampleColor(interpUV.x, interpUV.y) : glm::vec3(0.5f);
         ke = emissionT ? emissionT->SampleColor(interpUV.x, interpUV.y) : glm::vec3(0.0f);
         
 
-        glm::vec3 white(1, 1, 1);
-        glm::vec3 light_ambient_intensity = kd;
-        glm::vec3 light_diffuse_intensity(0.9, 0.9, 0.9);
-        glm::vec3 light_specular_intensity(0.15, 0.15, 0.15);
+
+        glm::vec3 white(1);
+        glm::vec3 light_ambient_intensity(0.01);
+        glm::vec3 light_diffuse_intensity(0.6);
+        glm::vec3 light_specular_intensity(0.8);
         //glm::vec3 light_specular_intensity(0.8, 0.8, 0.8);
 
         //Ambient 
@@ -224,16 +242,16 @@ class TextureMapShader : public IShader {
 
         //Diffuse
         diffuse = light_diffuse_intensity * kd * std::max(glm::dot(interpNormal, LightDir), 0.0f);
-        //diffuse =  kd * std::max(glm::dot(interpNormal, LightDir), 0.0f);
+      
 
         //Specular
         ReflectDir = glm::reflect(-LightDir, interpNormal);
-        float spec = std::pow(std::max((glm::dot(interpViewDir, ReflectDir)), 0.0f), 5.0f);
-        specular = light_specular_intensity * ks * spec ;
+        float spec = std::pow(std::max((glm::dot(interpViewDir, ReflectDir)), 0.0f), 1.0f);
+        specular = light_specular_intensity * ks * spec;
 
-        //glm::vec3 col = (ke + ambient + diffuse) + specular * white;
+        glm::vec3 col = (ke + ambient + diffuse + specular);
 
-       glm::vec3 col = kd;
+        //glm::vec3 col = (diffuse + specular);
    
  
         col.x = mathUtils::Clamp(col.x, 0, 1);
@@ -244,5 +262,23 @@ class TextureMapShader : public IShader {
         color.g = col.y;
         color.b = col.z;
         color.a = 1;
+
+        return true;
+    }
+};
+
+class ShadowShader : public IShader {
+    virtual glm::vec4 vertex(int bufferIndex, int triangleIndex, VSOutput* vsOutput) 
+    {
+        glm::vec3 meshVertex = RenderMesh->Vertices[bufferIndex];
+
+        glm::vec4 tmp(meshVertex, 1.0f);
+
+        return  light->projectionMaxtrix * light->viewMatrix * *ModelMatrix * tmp; // MVP
+    }
+
+    virtual bool fragment(const glm::vec3& barycentric, Color& color)
+    {
+        return false;
     }
 };

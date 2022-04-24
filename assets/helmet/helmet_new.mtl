@@ -7,7 +7,7 @@ Ke 0.0 0.0 0.0
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd helmet_diffuse.png
-norm helmet_normal.tga
-map_Ke helmet_emission.tga
-map_Ka helmet_basecolor.tga
+map_Kd Default_albedo.jpg
+norm Default_normal.jpg
+map_Ke Default_emissive.jpg
+map_Ka Default_albedo.jpg

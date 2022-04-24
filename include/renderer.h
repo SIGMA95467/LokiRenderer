@@ -35,7 +35,7 @@ public:
     Renderer(int width, int height, const char* title);
     ~Renderer();
 
-    void RenderMesh(Mesh* mesh, glm::mat4* modelMatrix, IShader* shader, Material* material);
+    void RenderMesh(Mesh* mesh, glm::mat4* modelMatrix, IShader* shader, Material* material = nullptr, Light* light = nullptr);
     //void ClipTriangle(Mesh* mesh, Matrix4x4* modelMatrix, Material* mat, int triangleIndex, float zNear, float zFar);
 
 
@@ -49,6 +49,7 @@ public:
     // void SetRenderState();
     bool SimpleClip(glm::vec4* clipSpaceVertices);
 
+    float* GetDepthBuffer();
 
     //void ViewportTransformVertex(VSOutput* io_pVSOutput);
 
@@ -58,6 +59,7 @@ private:
     IShader* mShader;
     Rasterizer* mRasterizer;
     Camera* mCamera;
+    Light* light;
 
 };
 
